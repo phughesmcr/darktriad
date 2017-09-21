@@ -1,0 +1,30 @@
+{
+  "name": "darktriad",
+  "version": "1.0.0",
+  "description": "Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a string.",
+  "main": "index.js",
+  "dependencies": {
+    "happynodetokenizer": "0.2.1",
+    "lex-helpers": "0.0.5",
+    "simplengrams": "0.1.2"
+  },
+  "keywords": [
+    "psychology",
+    "dark triad",
+    "prediction",
+    "narcissism",
+    "Machiavellianism",
+    "analysis",
+    "sentiment",
+    "psychopathy",
+    "sentiment",
+    "emotion"
+  ],
+  "author": "P. Hughes <peter@phugh.es> (http://www.phugh.es)",
+  "license": "CC-BY-NC-SA-3.0",
+  "homepage": "https://github.com/phugh/darktriad",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phugh/darktriad"
+  }
+}
