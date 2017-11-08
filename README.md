@@ -29,7 +29,7 @@ console.log(triad)
 ## Default Output Example
 ```javascript
 {
-  triad: 0.632160368,
+  darktriad: 0.632160368,
   machiavellianism: 0.596726179,
   narcissism: 0.715042033,
   psychopathy: 0.489276573
@@ -128,7 +128,7 @@ By default these are set to infinity, ensuring that no words from the lexicon ar
 
 ```javascript
 {
-  triad:
+  darktriad:
     [
       [ 'magnificent', 1, -192.0206116, -1.3914537072463768 ],
       [ 'capital', 1, -133.9311307, -0.9705154398550726 ],
@@ -151,7 +151,7 @@ By default these are set to infinity, ensuring that no words from the lexicon ar
 Based on [Preotiuc-Pietro, Daniel and Carpenter, Jordan and Giorgi, Salvatore and Ungar, Lyle, {CIKM} (2016). Studying the Dark Triad of Personality using Twitter Behavior. Proceedings of the 25th {ACM} Conference on Information and Knowledge.](http://wwbp.org/papers/darktriad16cikm.pdf)
 
 ### Lexicon
-Using the dark triad lexicon data from [this site](https://sites.sas.upenn.edu/danielpr/pages/resources) under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/).
+Using the dark triad lexicon data from [this site](https://sites.sas.upenn.edu/danielpr/pages/resources) under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) licence.
 
 ## Licence
 (C) 2017 [P. Hughes](https://www.phugh.es).

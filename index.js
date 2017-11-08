@@ -1,6 +1,6 @@
 /**
  * darkTriad
- * v1.0.0
+ * v1.0.1
  *
  * Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a
  * string.
@@ -12,7 +12,7 @@
  * darktriad2016cikm:
  *  Studying the Dark Triad of Personality using Twitter Behavior,
  *  Preotiuc-Pietro, Daniel and Carpenter, Jordan and Giorgi, Salvatore and
- *  Ungar, Lyle, CIKM,
+ *  Ungar, Lyle, {CIKM},
  *  Proceedings of the 25th {ACM} Conference on Information and Knowledge
  *  Management, 2016
  *
@@ -43,10 +43,9 @@
  *
  * See README.md for help.
  *
- * @param {string} str input string
+ * @param {string} str  input string
  * @param {Object} opts options object
- * @return {Object} object with 'triad', 'narcissism', 'machiavelli', and
- *                  'psychopathy' keys
+ * @return {Object}
  */
 
 'use strict'
@@ -54,21 +53,14 @@
   const global = this;
   const previous = global.darkTriad;
 
-  let triad = global.triad;
-  let narcissism = global.narcissism;
-  let machiavelli = global.machiavelli;
-  let psychopathy = global.psychopathy;
-
+  let lexicon = global.lexicon;
   let lexHelpers = global.lexHelpers;
   let simplengrams = global.simplengrams;
   let tokenizer = global.tokenizer;
 
   if (typeof lexicon === 'undefined') {
     if (typeof require !== 'undefined') {
-      triad = require('./data/darktriad.json');
-      narcissism = require('./data/narcissism.json');
-      machiavelli = require('./data/machiavellianism.json');
-      psychopathy = require('./data/psychopathy.json');
+      lexicon = require('./data/lexicon.json');
       lexHelpers = require('lex-helpers');
       simplengrams = require('simplengrams');
       tokenizer = require('happynodetokenizer');
@@ -90,7 +82,7 @@
    */
   const doLex = (matches, places, encoding, wordcount) => {
     const lex = {};
-    lex.triad = calcLex(matches.triad, 0.632024388686, places, encoding,
+    lex.darktriad = calcLex(matches.darktriad, 0.632024388686, places, encoding,
         wordcount);
     lex.machiavellianism = calcLex(matches.machiavellianism, 0.596743883684,
         places, encoding, wordcount);
@@ -112,7 +104,7 @@
    */
   const doMatches = (matches, sortBy, wordcount, places, encoding) => {
     const match = {};
-    match.triad = prepareMatches(matches.triad, sortBy, wordcount, places,
+    match.darktriad = prepareMatches(matches.darktriad, sortBy, wordcount, places,
         encoding);
     match.machiavellianism = prepareMatches(matches.machiavellianism, sortBy,
         wordcount, places, encoding);
@@ -181,26 +173,19 @@
       tokens = tokens.concat(bigrams, trigrams);
     }
     // recalculate wordcount if wcGrams is true
-    if (opts.wcGrams.toLowerCase === 'true') wordcount = tokens.length;
+    if (opts.wcGrams.toLowerCase() === 'true') wordcount = tokens.length;
     // get matches from array
-    const matches = {
-      triad: getMatches(tokens, triad, opts.min, opts.max).darktriad,
-      narcissism: getMatches(tokens, narcissism, opts.min, opts.max).narcissism,
-      machiavellianism: getMatches(tokens, machiavelli, opts.min,
-          opts.max).machiavellianism,
-      psychopathy: getMatches(tokens, psychopathy, opts.min,
-          opts.max).psychopathy,
-    };
+    const matches = getMatches(tokens, lexicon, opts.min, opts.max);
     // calculate lexical useage
     if (output === 'matches') {
       // return matches
       return doMatches(matches, sortBy, wordcount, places, encoding);
     } else if (output === 'full') {
       // return full
-      const full = {};
-      full.matches = doMatches(matches, sortBy, wordcount, places, encoding);
-      full.values = doLex(matches, places, encoding, wordcount);
-      return full;
+      return {
+        matches: doMatches(matches, sortBy, wordcount, places, encoding),
+        values: doLex(matches, places, encoding, wordcount),
+      };
     } else {
       if (output !== 'lex') {
         console.warn('darkTriad: output option ("' + output +

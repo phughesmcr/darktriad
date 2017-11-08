@@ -1,12 +1,12 @@
 {
   "name": "darktriad",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a string.",
   "main": "index.js",
   "dependencies": {
-    "happynodetokenizer": "0.2.1",
-    "lex-helpers": "0.0.5",
-    "simplengrams": "0.1.2"
+    "happynodetokenizer": "^0.2.1",
+    "lex-helpers": "^0.1.1",
+    "simplengrams": "^0.1.2"
   },
   "keywords": [
     "psychology",
