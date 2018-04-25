@@ -1,6 +1,6 @@
 /**
  * darkTriad
- * v1.0.1
+ * v2.0.1
  *
  * Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a
  * string.
@@ -31,11 +31,11 @@
  *  'encoding': 'freq',
  *  'max': Number.POSITIVE_INFINITY,
  *  'min': Number.NEGATIVE_INFINITY,
- *  'nGrams': 'true',
+ *  'nGrams': '[2, 3],
  *  'output': 'lex',
  *  'places': 9,
  *  'sortBy': 'lex',
- *  'wcGrams': 'false',
+ *  'wcGrams': false,
  * }
  * const str = 'A big long string of text...';
  * const triad = darktriad(str, opts);
@@ -48,11 +48,12 @@
  * @return {Object}
  */
 
-'use strict'
-;(function() {
+(function() {
+  'use strict';
   const global = this;
   const previous = global.darkTriad;
 
+  let async = global.async;
   let lexicon = global.lexicon;
   let lexHelpers = global.lexHelpers;
   let simplengrams = global.simplengrams;
@@ -60,60 +61,19 @@
 
   if (typeof lexicon === 'undefined') {
     if (typeof require !== 'undefined') {
-      lexicon = require('./data/lexicon.json');
+      async = require('async');
       lexHelpers = require('lex-helpers');
+      lexicon = require('./data/lexicon.json');
       simplengrams = require('simplengrams');
       tokenizer = require('happynodetokenizer');
-    } else throw new Error('darkTriad required modules not found!');
+    } else throw new Error('darkTriad: required modules not found!');
   }
 
   const arr2string = lexHelpers.arr2string;
-  const calcLex = lexHelpers.calcLex;
+  const doLex = lexHelpers.doLex;
+  const doMatches = lexHelpers.doMatches;
   const getMatches = lexHelpers.getMatches;
-  const prepareMatches = lexHelpers.prepareMatches;
-
-  /**
-   * @function doLex
-   * @param  {Object} matches   lexical matches object
-   * @param  {number} places    decimal places limit
-   * @param  {string} encoding  type of lexical encoding
-   * @param  {number} wordcount total word count
-   * @return {Object} lexical values object
-   */
-  const doLex = (matches, places, encoding, wordcount) => {
-    const lex = {};
-    lex.darktriad = calcLex(matches.darktriad, 0.632024388686, places, encoding,
-        wordcount);
-    lex.machiavellianism = calcLex(matches.machiavellianism, 0.596743883684,
-        places, encoding, wordcount);
-    lex.narcissism = calcLex(matches.narcissism, 0.714881303759, places,
-        encoding, wordcount);
-    lex.psychopathy = calcLex(matches.psychopathy, 0.48892463341, places,
-        encoding, wordcount);
-    return lex;
-  };
-
-  /**
-   * @function doMatches
-   * @param  {Object} matches   lexical matches object
-   * @param  {string} sortBy    how to sort arrays
-   * @param  {number} wordcount total word count
-   * @param  {number} places    decimal places limit
-   * @param  {string} encoding  type of lexical encoding
-   * @return {Object} sorted matches object
-   */
-  const doMatches = (matches, sortBy, wordcount, places, encoding) => {
-    const match = {};
-    match.darktriad = prepareMatches(matches.darktriad, sortBy, wordcount, places,
-        encoding);
-    match.machiavellianism = prepareMatches(matches.machiavellianism, sortBy,
-        wordcount, places, encoding);
-    match.narcissism = prepareMatches(matches.narcissism, sortBy, wordcount,
-        places, encoding);
-    match.psychopathy = prepareMatches(matches.psychopathy, sortBy, wordcount,
-        places, encoding);
-    return match;
-  };
+  const itemCount = lexHelpers.itemCount;
 
   /**
   * Analyse the dark triad of a string
@@ -134,25 +94,26 @@
     str = str.toLowerCase().trim();
     // options defaults
     if (!opts || typeof opts !== 'object') {
+      console.warn('darkTriad: using default options.');
       opts = {
         'encoding': 'freq',
         'max': Number.POSITIVE_INFINITY,
         'min': Number.NEGATIVE_INFINITY,
-        'nGrams': 'true',
+        'nGrams': [2, 3],
         'output': 'lex',
         'places': 9,
         'sortBy': 'lex',
-        'wcGrams': 'false',
+        'wcGrams': false,
       };
     }
     opts.encoding = opts.encoding || 'freq';
     opts.max = opts.max || Number.POSITIVE_INFINITY;
     opts.min = opts.min || Number.NEGATIVE_INFINITY;
-    opts.nGrams = opts.nGrams || 'true';
+    opts.nGrams = opts.nGrams || [2, 3];
     opts.output = opts.output || 'lex';
     opts.places = opts.places || 9;
     opts.sortBy = opts.sortBy || 'lex';
-    opts.wcGrams = opts.wcGrams || 'false';
+    opts.wcGrams = opts.wcGrams || false;
     const encoding = opts.encoding;
     const output = opts.output;
     const places = opts.places;
@@ -167,32 +128,61 @@
     // get wordcount before we add ngrams
     let wordcount = tokens.length;
     // get n-grams
-    if (opts.nGrams.toLowerCase() === 'true') {
-      const bigrams = arr2string(simplengrams(str, 2));
-      const trigrams = arr2string(simplengrams(str, 3));
-      tokens = tokens.concat(bigrams, trigrams);
+    if (opts.nGrams && wordcount > 2) {
+      async.each(opts.nGrams, function(n, callback) {
+        if (n < wordcount) {
+          tokens = tokens.concat(
+            arr2string(simplengrams(str, n))
+          );
+        } else {
+          console.warn(`nGram option "${n}" is greter than the word count. Ignoring.`);
+        }
+        callback();
+      }, function(err) {
+        if (err) console.error(err);
+      });
     }
     // recalculate wordcount if wcGrams is true
-    if (opts.wcGrams.toLowerCase() === 'true') wordcount = tokens.length;
+    if (opts.wcGrams) wordcount = tokens.length;
+    // reduce tokens to count item
+    tokens = itemCount(tokens);
     // get matches from array
     const matches = getMatches(tokens, lexicon, opts.min, opts.max);
+    // define intercept values
+    const ints = {
+      darktriad: 0.632024388686,
+      machiavellianism: 0.596743883684,
+      narcissism: 0.714881303759,
+      psychopathy: 0.48892463341,
+    };
     // calculate lexical useage
     if (output === 'matches') {
       // return matches
       return doMatches(matches, sortBy, wordcount, places, encoding);
     } else if (output === 'full') {
       // return full
-      return {
-        matches: doMatches(matches, sortBy, wordcount, places, encoding),
-        values: doLex(matches, places, encoding, wordcount),
-      };
+      let full = {};
+      async.parallel([
+        function(callback) {
+          full.matches = doMatches(matches, sortBy, wordcount, places, 
+              encoding);
+          callback();
+        },
+        function(callback) { 
+          full.values = doLex(matches, ints, places, encoding, wordcount);
+          callback();
+        },
+      ], function(err) {
+          if (err) console.error(err);
+          return full;
+      });
     } else {
       if (output !== 'lex') {
         console.warn('darkTriad: output option ("' + output +
             '") is invalid, defaulting to "lex".');
       }
       // default to lexical values
-      return doLex(matches, places, encoding, wordcount);
+      return doLex(matches, ints, places, encoding, wordcount);
     }
   };
 

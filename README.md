@@ -153,7 +153,7 @@ Based on [Preotiuc-Pietro, Daniel and Carpenter, Jordan and Giorgi, Salvatore an
 ### Lexicon
 Using the dark triad lexicon data from [this site](https://sites.sas.upenn.edu/danielpr/pages/resources) under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) licence.
 
-## Licence
-(C) 2017 [P. Hughes](https://www.phugh.es).
+## License
+(C) 2017 [P. Hughes](https://www.phugh.es). All rights reserved.
 
-[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/).
+Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.
