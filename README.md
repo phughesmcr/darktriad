@@ -6,16 +6,18 @@ Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a stri
 
 darkTriad is provided for educational and entertainment purposes only.
 
-darkTriad does not provide, nor is it a substitute for, medical advice or diagnosis.
+darkTriad does not provide, nor is it a substitute for, medical or psychological advice or diagnosis.
 
 ## Usage
 ```javascript
 const darktriad = require('darktriad');
 const opts = {
   'encoding': 'freq',
+  'locale': 'US',
+  'logs': 3,
   'max': Number.POSITIVE_INFINITY,
   'min': Number.NEGATIVE_INFINITY,
-  'nGrams': 'true',
+  'nGrams': [2, 3],
   'output': 'lex',
   'places': 9,
   'sortBy': 'lex',
@@ -59,7 +61,7 @@ The options object is optional and provides a number of controls to allow you to
 
 ### 'encoding'
 
-**String - valid options: 'binary', or 'freq' (default)**
+**String - valid options: 'freq' (default), 'binary', or 'percent'**
 
 N.B - You probably don't want to change this, ever.
 
@@ -68,6 +70,8 @@ Controls how the lexical value is calculated.
 Binary is simply the addition of lexical weights, i.e. word1 + word2 + word3.
 
 Frequency encoding takes the overall wordcount and word frequency into account, i.e. (word frequency / word count) * weight.
+
+Percent returns the percentage of token matches in each category as a decimal, i.e. 0.48 - 48%.
 
 ### 'output'
 
@@ -94,6 +98,18 @@ Use the nGrams option to include (true) or exclude (false) n-grams. For accuracy
 When set to true, the output from the nGrams option will be added to the word count.
 
 For accuracy it is recommended that this is set to false.
+
+### 'locale'
+**String - valid options: 'US' (default), 'GB'**
+The lexicon data is in American English (US), if the string(s) you want to analyse are in British English set the locale option to 'GB'.
+
+### 'logs'
+**Number - valid options: 0, 1, 2, 3 (default)**
+Used to control console.log, console.warn, and console.error outputs.
+* 0 = suppress all logs
+* 1 = print errors only
+* 2 = print errors and warnings
+* 3 = print all console logs
 
 ### 'sortBy'
 
@@ -154,6 +170,6 @@ Based on [Preotiuc-Pietro, Daniel and Carpenter, Jordan and Giorgi, Salvatore an
 Using the dark triad lexicon data from [this site](https://sites.sas.upenn.edu/danielpr/pages/resources) under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) licence.
 
 ## License
-(C) 2017 [P. Hughes](https://www.phugh.es). All rights reserved.
+(C) 2017-18 [P. Hughes](https://www.phugh.es). All rights reserved.
 
 Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.
