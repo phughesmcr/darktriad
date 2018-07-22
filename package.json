@@ -1,13 +1,13 @@
 {
   "name": "darktriad",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a string.",
   "main": "index.js",
   "dependencies": {
-    "async": "^2.6.0",
+    "async": "^2.6.1",
     "british_american_translate": "^1.0.1",
     "happynodetokenizer": "^0.4.0",
-    "lex-helpers": "^0.3.0",
+    "lex-helpers": "^0.3.1",
     "simplengrams": "^0.3.2"
   },
   "keywords": [

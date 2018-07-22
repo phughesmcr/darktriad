@@ -1,6 +1,6 @@
 /**
  * darkTriad
- * v3.0.0
+ * v3.1.0
  *
  * Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a
  * string.
@@ -30,10 +30,11 @@
  * const opts = {
  *  'encoding': 'freq',
  *  'locale': 'US',
- *  'logs': 3,
+ *  'logs': 2,
  *  'max': Number.POSITIVE_INFINITY,
  *  'min': Number.NEGATIVE_INFINITY,
  *  'nGrams': '[2, 3],
+ *  'noInt: false,
  *  'output': 'lex',
  *  'places': 9,
  *  'sortBy': 'lex',
@@ -79,7 +80,7 @@
     // default options
     opts.encoding = (typeof opts.encoding !== 'undefined') ? opts.encoding : 'freq';
     opts.locale = (typeof opts.locale !== 'undefined') ? opts.locale : 'US';
-    opts.logs = (typeof opts.logs !== 'undefined') ? opts.logs : 3;
+    opts.logs = (typeof opts.logs !== 'undefined') ? opts.logs : 2;
     if (opts.suppressLog) opts.logs = 0;
     opts.max = (typeof opts.max !== 'undefined') ? opts.max : Number.POSITIVE_INFINITY;
     opts.min = (typeof opts.min !== 'undefined') ? opts.min : Number.NEGATIVE_INFINITY;
@@ -93,12 +94,15 @@
     }
     opts.nGrams = (typeof opts.nGrams !== 'undefined') ? opts.nGrams : [2, 3];
     if (!Array.isArray(opts.nGrams)) {
-      if (opts.logs > 1) {
+      if (opts.nGrams === 0 || opts.nGrams === '0') {
+        opts.nGrams = [0];
+      } else if (opts.logs > 1) {
         console.warn('darkTriad: nGrams option must be an array! ' + 
             'Defaulting to [2, 3].');
+        opts.nGrams = [2, 3];
       }
-      opts.nGrams = [2, 3];
     }
+    opts.noInt = (typeof opts.noInt !== 'undefined') ? opts.noInt : false;
     opts.output = (typeof opts.output !== 'undefined') ? opts.output : 'lex';
     opts.places = (typeof opts.places !== 'undefined') ? opts.places : 9;
     opts.sortBy = (typeof opts.sortBy !== 'undefined') ? opts.sortBy : 'lex';
@@ -120,7 +124,7 @@
     // convert to lowercase and trim whitespace 
     str = str.toLowerCase().trim();
     // translalte US English to UK English if selected
-    if (opts.locale === 'GB') str = trans.uk2us(str);
+    if (opts.locale.match(/gb/gi)) str = trans.uk2us(str);
     // convert our string to tokens
     let tokens = tokenizer(str, {logs: opts.logs});
     // if there are no tokens return null
@@ -134,7 +138,7 @@
     if (nGrams) {
       async.each(nGrams, function(n, callback) {
         if (wordcount < n) {
-          callback(`darkTriad: wordcount (${wordcount}) less than n-gram value (${n}). Ignoring.`);
+          callback(`wordcount (${wordcount}) less than n-gram value (${n}). Ignoring.`);
         } else {
           tokens = [...arr2string(simplengrams(str, n, {logs: logs})), ...tokens];
           callback();
@@ -144,34 +148,44 @@
       });
     }
     // recalculate wordcount if wcGrams is true
-    if (opts.wcGrams) wordcount = tokens.length;
+    if (opts.wcGrams === true) wordcount = tokens.length;
     // get matches from array
     const matches = getMatches(itemCount(tokens), lexicon, opts.min, opts.max);
     // define intercept values
-    const ints = {
+    let ints = {
       darktriad: 0.632024388686,
       machiavellianism: 0.596743883684,
       narcissism: 0.714881303759,
       psychopathy: 0.48892463341,
     };
+    if (opts.noInt == true) {
+      ints = {
+        darktriad: 0,
+        machiavellianism: 0,
+        narcissism: 0,
+        psychopathy: 0,
+      };
+    }
     // calculate lexical useage
     if (output.match(/matches/gi)) {
       // return matches
       return doMatches(matches, sortBy, wordcount, places, encoding);
     } else if (output.match(/full/gi)) {
       // return matches and values in one object
+      let results;
       async.parallel({
         matches: function(callback) {
           callback(null, doMatches(matches, sortBy, wordcount, places, 
-              encoding));
+            encoding));
         },
         values: function(callback) {
           callback(null, doLex(matches, ints, places, encoding, wordcount));
         },
-      }, function(err, results) {
-        if (err && logs > 0) console.error(err);
-        return results;
+      }, function(err, res) {
+        if (err && logs > 0) console.error('darkTriad: ' + err);
+        results = res;
       });
+      return results;
     } else {
       if (!output.match(/lex/gi) && logs > 1) {
         console.warn('darkTriad: output option ("' + output +
