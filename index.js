@@ -1,6 +1,6 @@
 /**
  * darkTriad
- * v3.1.0
+ * v3.1.1
  *
  * Analyse the dark triad (narcissism, Machiavellianism, and psychopathy) of a
  * string.
@@ -135,7 +135,7 @@
     // get wordcount before we add n-grams
     let wordcount = tokens.length;
     // get n-grams
-    if (nGrams) {
+    if (nGrams && nGrams[0] !== 0) {
       async.each(nGrams, function(n, callback) {
         if (wordcount < n) {
           callback(`wordcount (${wordcount}) less than n-gram value (${n}). Ignoring.`);
@@ -176,7 +176,7 @@
       async.parallel({
         matches: function(callback) {
           callback(null, doMatches(matches, sortBy, wordcount, places, 
-            encoding));
+              encoding));
         },
         values: function(callback) {
           callback(null, doLex(matches, ints, places, encoding, wordcount));
